@@ -25,30 +25,32 @@ var Schema = mongoose.Schema;
 
 var QuestionSchema = new Schema({
   product_id:  Number, // String is shorthand for {type: String}
-  question_id: Number,
-  question_body:String,
-  question_date:String,
+  id: Number,
+  body:String,
+  date_written:{type:Date, default: Date.now },
   asker_name: String,
+  asker_email:String,
   reported: Boolean,
-  helpfulness:Number
+  helpful:Number
 });
-var Question = mongoose.model('Question', QuestionSchema);
+var questions = mongoose.model('Qquestions', QuestionSchema);
 
 var AnswerSchema = new Schema({
   question_id: Number,
-  answer_id: Number,
+  id: Number,
   body: String,
-  date: String,
+  date_written: {type:Date, default: Date.now },
   answer_name: String,
-  helpfulness: Number,
+  helpful: Number,
+  reported:0
 })
-var Answer= mongoose.model('Answer', AnswerSchema);
+var answers= mongoose.model('answers', AnswerSchema);
 var PhotoSchema = new Schema({
   answer_id: Number,
-  photo_id: Number,
+  id: Number,
   url:String
 })
-var Photo= mongoose.model('Photo', PhotoSchema);
+var answers_photos= mongoose.model('answers_photos', PhotoSchema);
 mongoose.Promise = Promise;
 db.on('error', console.error.bind(console, 'Connection error:'));
 db.once('open', () => {
@@ -57,6 +59,6 @@ db.once('open', () => {
 
 
 
-module.exports.Question = Question
-module.exports.Answer = Answer
-module.exports.Photo = Photo
+module.exports.Question = questions
+module.exports.Answer = answers
+module.exports.Photo = answers_photos
