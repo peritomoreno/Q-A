@@ -1,10 +1,19 @@
 //
 
 const mongoose = require('mongoose');
+//since my query is taking a long time. And mongo itself has a default time out set. So it times out, if the query takes longer than the timeout time, so i need to keep the mongo connection
+const option = {
+  socketTimeoutMS: 30000,
+  keepAlive: true,
+  reconnectTries: 30000,
+  useNewUrlParser: true
+};
+
+
 if(process.env.MONGODB_URI){
-  mongoose.connect(process.env.MONGODB_URI)
+  mongoose.connect(process.env.MONGODB_URI,option)
 } else{
-  mongoose.connect('mongodb://localhost:27017/q_a_db', { useNewUrlParser: true });
+  mongoose.connect('mongodb://localhost:27017/q_a_db',option);
 }
 mongoose.connection.on('connected', function() {
   console.log(
@@ -27,22 +36,23 @@ var QuestionSchema = new Schema({
   product_id:  Number, // String is shorthand for {type: String}
   id: Number,
   body:String,
-  date_written:{type:Date, default: Date.now },
+  date_written:String,
   asker_name: String,
   asker_email:String,
-  reported: Boolean,
+  reported: Number,
   helpful:Number
 });
-var questions = mongoose.model('Qquestions', QuestionSchema);
+var questions = mongoose.model('Questions', QuestionSchema);
 
 var AnswerSchema = new Schema({
   question_id: Number,
   id: Number,
   body: String,
-  date_written: {type:Date, default: Date.now },
-  answer_name: String,
+  date_written: String,
+  answerer_name: String,
+  answerer_email:String,
   helpful: Number,
-  reported:0
+  reported:Number
 })
 var answers= mongoose.model('answers', AnswerSchema);
 var PhotoSchema = new Schema({
