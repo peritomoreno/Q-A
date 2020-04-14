@@ -48,8 +48,15 @@ module.exports = {
           ).exec();
         });
     },
+    GetAll: (id,count,page) => {
+      return Question.find({product_id:id}).skip((page-1)*count).limit(count).exec()
+    }
   },
-  Photo: {},
+  Photo: {
+    GetAll: (id) => {
+      return Photo.find({answer_id:id}).exec()
+    }
+  },
   Answer: {
     AddHelp: (params) => {
       return Answer.findOneAndUpdate(
@@ -118,5 +125,8 @@ module.exports = {
             });
         });
     },
+    GetAll: (id,count,page) => {
+      return Answer.find({question_id:id}).skip((page-1)*count).limit(count).exec()
+    }
   },
 };
