@@ -11,8 +11,8 @@ router.put('/qa/question/:question_id/helpful',questions.AddHelp) //Mark Questio
 router.put('/qa/question/:question_id/report',questions.AddReport) //Report Question
 router.put('/qa/answer/:answer_id/helpful',answers.AddHelp) //Mark answer as Helpful
 router.put('/qa/answer/:answer_id/report', answers.AddReport) //Report answer
-//use loader.io
-router.get('loaderio-f63f657286db0a26336a4b2ed0aeef34.txt',(req,res)=>res.send("loaderio-f63f657286db0a26336a4b2ed0aeef34"))
+
+router.get('/loaderio-f63f657286db0a26336a4b2ed0aeef34/',(req,res)=>res.send("loaderio-f63f657286db0a26336a4b2ed0aeef34"))//use loader.io
 
 
 module.exports = router;
