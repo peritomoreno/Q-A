@@ -11,7 +11,7 @@ router.put('/question/:question_id/helpful',questions.AddHelp) //Mark Question a
 router.put('/question/:question_id/report',questions.AddReport) //Report Question
 router.put('/answer/:answer_id/helpful',answers.AddHelp) //Mark answer as Helpful
 router.put('/answer/:answer_id/report',answers.AddReport) //Report answer
-
+router.get('',(req,res)=>res.send("111"))
 
 
 module.exports = router;
