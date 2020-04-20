@@ -7,7 +7,7 @@ const cors = require("cors")
 const port = 8848
 
 app.use(parser.json())
-app.use('/qa',router)
+app.use('',router)
 app.use(cors())
 // app.use(express.static(__dirname + '../../client/src/index.js'))
 
