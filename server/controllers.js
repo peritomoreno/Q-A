@@ -1,5 +1,5 @@
 const { Question, Answer, Photo } = require("./model");
-
+const Promise = require("bluebird")
 module.exports = {
   questions: {
     AddHelp: (req, res) => {
@@ -48,13 +48,13 @@ module.exports = {
         let page = req.params.count || 1;
         let questionArr = [];
         let questions = await Question.GetAll(id, count, page);
-        for (let k = 0; k < questions.length; k++){
+        for (let k = 0; k < questions.length; k++) {
           let questionObj = {
             question_id: questions[k].id,
             question_body: questions[k].body,
             aker_name: questions[k].asker_name,
             reported: questions[k].reported,
-            helpfulness:questions[k].helpful,
+            helpfulness: questions[k].helpful,
             question_date: new Date(questions[k].date_written),
             answers: {}
           }
@@ -62,7 +62,7 @@ module.exports = {
           for (let i = 0; i < answers.length; i++) {
             let photos = await Photo.GetAll(answers[i].id);
             let url = []
-            for (let j = 0; j < photos.length; j++){
+            for (let j = 0; j < photos.length; j++) {
               url.push({ id: photos[j].id, url: photos[j].url })
             }
             let Obj = {
@@ -73,15 +73,15 @@ module.exports = {
               photos: url,
               date: new Date(answers[i].date_written),
             };
-          questionObj['answers'][answers[i].id]=Obj
+            questionObj['answers'][answers[i].id] = Obj
           }
           questionArr.push(questionObj)
         }
-        res.status(208).send({product_id:id,results:questionArr})
+        res.status(208).send({ product_id: id, results: questionArr })
       } catch (err) {
         console.log("fetch failed", err);
       }
-    },
+    }
   },
   answers: {
     AddHelp: (req, res) => {
@@ -151,37 +151,5 @@ module.exports = {
       }
     },
   },
-};
+}
 
-// Answer.GetAll(id,count,page)
-//         .then(response => {
-//           let results=[]
-//           let datas = JSON.parse(JSON.stringify(response));
-//           datas.map(data => {
-//             console.log(data.id);
-
-//             let url = await Photo.GetAll(data.id)
-//             console.log(url);
-
-//
-//           })
-//       })
-//
-
-// let results = await answers.map(async answer => {
-//   let photos = await Photo.GetAll(answer.id)
-//   let url = []
-//   photos.map(async photo => {
-//     url.push({ id: photo.id, url: photo.url })
-//   })
-//   let Obj = {
-//     answer_id: answer.id,
-//     body: answer.body,
-//     answerer_name: answer.answerer_email,
-//     helpfulness: answer.helpful,
-//     photos: url,
-//     date: new Date(answer.date_written)
-//   }
-//   console.log(Obj);
-
-// })
