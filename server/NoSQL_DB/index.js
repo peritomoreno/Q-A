@@ -13,11 +13,11 @@ const option = {
 if(process.env.MONGODB_URI){
   mongoose.connect(process.env.MONGODB_URI,option)
 } else{
-  mongoose.connect('mongodb://3.21.186.205:27017/q_a_db',option);
+  mongoose.connect('mongodb://3.133.11.253/q_a_db',option);
 }
 mongoose.connection.on('connected', function() {
   console.log(
-    'Mongoose default connection is open to mongodb://localhost:27017/q_a_db'
+    'Mongoose default connection is opened'
   );
 });
 

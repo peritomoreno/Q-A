@@ -42,6 +42,8 @@ module.exports = {
         });
     },
     GetAll: async (req, res) => {
+      console.log("111");
+
       try {
         let id = req.params.product_id;
         let count = req.params.count || 5;
