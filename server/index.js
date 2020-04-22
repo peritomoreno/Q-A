@@ -5,7 +5,6 @@ const router = require('./router.js')
 //Dealing with CORS Errors in React and Express
 const cors = require("cors")
 const port = 8848
-
 app.use(parser.json())
 app.use('',router)
 app.use(cors())

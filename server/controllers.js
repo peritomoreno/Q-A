@@ -1,5 +1,6 @@
 const { Question, Answer, Photo } = require("./model");
 const Promise = require("bluebird")
+const { getAsync, setAsync, expAsync } = require("./NoSQL_DB/redis");
 module.exports = {
   questions: {
     AddHelp: (req, res) => {
@@ -42,6 +43,15 @@ module.exports = {
         });
     },
     GetAll: async (req, res) => {
+      let id = req.params.product_id;
+      getAsync(`meta:${id}`)
+        .then(data => {
+          // if data is not null
+          if (data !== null) {
+            console.log("cached meta data sent: ", data);
+            res.send(JSON.parse(data));
+          }
+        })
       try {
         let id = req.params.product_id;
         let count = req.params.count || 5;
@@ -78,78 +88,96 @@ module.exports = {
           questionArr.push(questionObj)
         }
         res.status(208).send({ product_id: id, results: questionArr })
+        let wrappedData = { product_id: id, results: questionArr }
+        setAsync(
+          `meta:${id}`,
+          JSON.stringify(wrappedData)
+        );
       } catch (err) {
         console.log("fetch failed", err);
       }
     }
   },
-  answers: {
-    AddHelp: (req, res) => {
-      let id = req.params.answer_id;
-      Answer.AddHelp(id)
-        .then((response) => res.status(203).json(response))
-        .catch((err) => {
-          console.log(err);
-          res.sendStatus(430);
-        });
-    },
-    AddReport: (req, res) => {
-      let id = req.params.answer_id;
-      Answer.AddReport(id)
-        .then((response) => res.status(204).json(response))
-        .catch((err) => {
-          console.log(err);
-          res.sendStatus(440);
-        });
-    },
-    AddAnswer: (req, res) => {
-      let id = req.params.question_id;
-      let date = new Date().toISOString().slice(0, 10);
-      let params = {
-        question_id: id,
-        answerer_name: req.body.name,
-        answerer_email: req.body.email,
-        photos: req.body.photos,
-        date_written: date,
-        body: req.body.body,
-      };
-      Answer.Create(params)
-        .then((response) => {
-          res.status(206).send("Created");
-        })
-        .catch((err) => {
-          console.log(err);
-          res.sendStatus(460);
-        });
-    },
-    GetAll: async (req, res) => {
-      try {
+    answers: {
+      AddHelp: (req, res) => {
+        let id = req.params.answer_id;
+        Answer.AddHelp(id)
+          .then((response) => res.status(203).json(response))
+          .catch((err) => {
+            console.log(err);
+            res.sendStatus(430);
+          });
+      },
+      AddReport: (req, res) => {
+        let id = req.params.answer_id;
+        Answer.AddReport(id)
+          .then((response) => res.status(204).json(response))
+          .catch((err) => {
+            console.log(err);
+            res.sendStatus(440);
+          });
+      },
+      AddAnswer: (req, res) => {
         let id = req.params.question_id;
-        let count = req.params.count || 5;
-        let page = req.params.count || 1;
-        let resultList = [];
-        let answers = await Answer.GetAll(id, count, page);
-        for (let i = 0; i < answers.length; i++) {
-          let photos = await Photo.GetAll(answers[i].id);
-          let url = []
-          for (let j = 0; j < photos.length; j++){
-            url.push({ id: photos[j].id, url: photos[j].url })
+        let date = new Date().toISOString().slice(0, 10);
+        let params = {
+          question_id: id,
+          answerer_name: req.body.name,
+          answerer_email: req.body.email,
+          photos: req.body.photos,
+          date_written: date,
+          body: req.body.body,
+        };
+        Answer.Create(params)
+          .then((response) => {
+            res.status(206).send("Created");
+          })
+          .catch((err) => {
+            console.log(err);
+            res.sendStatus(460);
+          });
+      },
+      GetAll: async (req, res) => {
+        let id = req.params.question_id;
+        getAsync(`meta:${id}`)
+          .then(data => {
+            // if data is not null
+            if (data !== null) {
+              console.log("cached meta data sent: ", data);
+              res.send(JSON.parse(data));
+            }
+          })
+        try {
+          let id = req.params.question_id;
+          let count = req.params.count || 5;
+          let page = req.params.count || 1;
+          let resultList = [];
+          let answers = await Answer.GetAll(id, count, page);
+          for (let i = 0; i < answers.length; i++) {
+            let photos = await Photo.GetAll(answers[i].id);
+            let url = []
+            for (let j = 0; j < photos.length; j++) {
+              url.push({ id: photos[j].id, url: photos[j].url })
+            }
+            let Obj = {
+              answer_id: answers[i].id,
+              body: answers[i].body,
+              answerer_name: answers[i].answerer_email,
+              helpfulness: answers[i].helpful,
+              photos: url,
+              date: new Date(answers[i].date_written),
+            };
+            resultList.push(Obj)
           }
-          let Obj = {
-            answer_id: answers[i].id,
-            body: answers[i].body,
-            answerer_name: answers[i].answerer_email,
-            helpfulness: answers[i].helpful,
-            photos: url,
-            date: new Date(answers[i].date_written),
-          };
-          resultList.push(Obj)
+          res.status(207).send({ question: id, page, count, results: resultList })
+          let wrappedData = { question: id, page, count, results: resultList }
+          setAsync(
+            `meta:${id}`,
+            JSON.stringify(wrappedData)
+          );
+        } catch (err) {
+          console.log("fetch failed", err);
         }
-        res.status(207).send({question:id,page,count,results:resultList})
-      } catch (err) {
-        console.log("fetch failed", err);
-      }
+      },
     },
-  },
-}
-
+  }
